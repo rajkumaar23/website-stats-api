@@ -3,16 +3,25 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 )
 
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 var HttpClient = &http.Client{}
-var PlausibleAPIToken = "iRx0iQDTT7S9fB2dKFByLne4C-Ee_Z-X_sYlxNiuX2lg1Oty2hLXzqcNI8bHvhCu"
 
 type PlausibleAPIResponse struct {
 	Results struct {
@@ -62,7 +71,7 @@ func GetPlausibleStats(page string) int {
 
 	apiUrl := fmt.Sprintf("https://plausible.pi.rajkumaar.co.in/api/v1/stats/aggregate?%v", queryParams.Encode())
 	req, _ := http.NewRequest(http.MethodGet, apiUrl, nil)
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", PlausibleAPIToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("PLAUSIBLE_API_TOKEN")))
 	res, err := HttpClient.Do(req)
 	if err != nil {
 		panic(err)
